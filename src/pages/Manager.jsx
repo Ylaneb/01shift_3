@@ -80,17 +80,17 @@ function FieldModal({ open, onClose, onSave, initial }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg relative">
+      <div className="bg-white/80 rounded-2xl shadow-lg border border-blue-100 backdrop-blur-sm p-6 w-full max-w-lg relative">
         <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl" onClick={onClose} aria-label="Close"><X /></button>
-        <form onSubmit={handleSubmit}>
-          <h2 className="text-xl font-bold mb-4">{initial ? "Edit Field" : "Add New Field"}</h2>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <h2 className="text-xl sm:text-2xl font-extrabold mb-2 text-[color:var(--primary-blue)] tracking-tight">{initial ? "Edit Field" : "Add New Field"}</h2>
           <div className="mb-2">
-            <label className="block mb-1 font-medium">Label</label>
-            <input name="label" value={field.label} onChange={handleChange} className="w-full border rounded p-2" required />
+            <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Label</label>
+            <input name="label" value={field.label} onChange={handleChange} className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150" required />
           </div>
           <div className="mb-2">
-            <label className="block mb-1 font-medium">Type</label>
-            <select name="type" value={field.type} onChange={handleChange} className="w-full border rounded p-2">
+            <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Type</label>
+            <select name="type" value={field.type} onChange={handleChange} className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150" required>
               <option value="text">Text</option>
               <option value="yesno">Yes/No</option>
               <option value="star">Star Rating Scale</option>
@@ -99,13 +99,13 @@ function FieldModal({ open, onClose, onSave, initial }) {
             </select>
           </div>
           <div className="mb-2">
-            <label className="block mb-1 font-medium">Section</label>
+            <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Section</label>
             <div className="flex gap-2">
               {['General', 'Medical'].map(sec => (
                 <button
                   type="button"
                   key={sec}
-                  className={`px-3 py-1 rounded ${field.section === sec ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                  className={`px-3 py-1 rounded-xl font-semibold transition-all duration-150 ${field.section === sec ? 'bg-[var(--primary-blue)] text-white scale-105 shadow' : 'bg-gray-100 text-gray-700 hover:bg-blue-50'}`}
                   onClick={() => handleSection(sec)}
                 >
                   {sec}
@@ -114,43 +114,43 @@ function FieldModal({ open, onClose, onSave, initial }) {
             </div>
           </div>
           <div className="mb-2 flex items-center gap-2">
-            <input type="checkbox" name="required" checked={field.required} onChange={handleChange} id="required" />
-            <label htmlFor="required" className="font-medium">Required</label>
+            <input type="checkbox" name="required" checked={field.required} onChange={handleChange} id="required" className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none" />
+            <label htmlFor="required" className="font-semibold text-[color:var(--text-secondary)]">Required</label>
           </div>
           {field.type === "dropdown" && (
             <div className="mb-2">
-              <label className="block mb-1 font-medium">Dropdown Options</label>
+              <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Dropdown Options</label>
               {(field.options || []).map((opt, i) => (
                 <div key={i} className="flex gap-2 mb-1">
-                  <input value={opt} onChange={e => handleOptionsChange(i, e.target.value)} className="border rounded p-1 flex-1" required />
-                  <button type="button" onClick={() => removeOption(i)} className="text-red-500">Remove</button>
+                  <input value={opt} onChange={e => handleOptionsChange(i, e.target.value)} className="border border-blue-100 rounded-xl p-1 flex-1 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150" required />
+                  <button type="button" onClick={() => removeOption(i)} className="text-red-500 font-semibold hover:underline">Remove</button>
                 </div>
               ))}
-              <button type="button" onClick={addOption} className="text-blue-600 mt-1">+ Add Option</button>
+              <button type="button" onClick={addOption} className="text-[var(--primary-blue)] mt-1 font-semibold hover:underline">+ Add Option</button>
             </div>
           )}
           <div className="mb-2">
-            <label className="block mb-1 font-medium">Shift Types</label>
+            <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Shift Types</label>
             <div className="flex gap-2 flex-wrap">
-              {["Day Shift", "Night Shift", "Evening Shift"].map(type => (
+              {['Day Shift', 'Night Shift', 'Evening Shift'].map(type => (
                 <label key={type} className={
                   (field.shiftTypes || []).includes(type)
-                    ? "bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer"
-                    : "bg-gray-100 text-gray-700 px-2 py-1 rounded cursor-pointer"
+                    ? 'bg-[var(--soft-blue)] text-[var(--primary-blue)] px-2 py-1 rounded-xl cursor-pointer font-semibold scale-105 shadow'
+                    : 'bg-gray-100 text-gray-700 px-2 py-1 rounded-xl cursor-pointer hover:bg-blue-50'
                 }>
                   <input
                     type="checkbox"
                     checked={(field.shiftTypes || []).includes(type)}
                     onChange={() => handleShiftTypeToggle(type)}
-                    className="mr-1"
+                    className="mr-1 accent-[var(--primary-blue)]"
                   />
                   {type}
                 </label>
               ))}
             </div>
           </div>
-          <div className="flex justify-end mt-4">
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+          <div className="flex justify-end mt-2">
+            <button type="submit" className="px-4 py-2 bg-gradient-to-br from-[var(--primary-blue)] to-[var(--primary-blue-light)] text-white rounded-2xl hover:from-[var(--primary-blue-light)] hover:to-[var(--primary-blue)] transition-all font-extrabold text-base shadow-lg tracking-wide mt-2 disabled:opacity-60 disabled:cursor-not-allowed">
               {initial ? "Save Changes" : "Add Field"}
             </button>
           </div>
@@ -215,71 +215,68 @@ export default function Manager() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Administrator Settings</h1>
-      <div className="mb-6 flex gap-4">
-        <button className="px-4 py-2 bg-blue-600 text-white rounded flex items-center gap-2 hover:bg-blue-700" onClick={handleAdd}>
-          <Plus className="w-4 h-4" /> Add New Field
-        </button>
-        <button className="px-4 py-2 bg-gray-200 rounded flex items-center gap-2" disabled>
-          <ListFilter className="w-4 h-4" /> Filter by shift (coming soon)
-        </button>
-      </div>
-      <FieldModal open={modalOpen} onClose={() => setModalOpen(false)} onSave={handleSave} initial={editField} />
-      <div className="bg-white rounded-xl shadow p-4">
-        <h2 className="text-lg font-bold mb-4">Manage Report Fields</h2>
-        {loading ? (
-          <div>Loading...</div>
-        ) : error ? (
-          <div className="text-red-500">{error}</div>
-        ) : fields.length === 0 ? (
-          <div className="text-gray-500">No fields found.</div>
-        ) : (
-          <div className="space-y-6">
-            {fields.map(field => (
-              <div key={field.id} className="border rounded-lg p-4 bg-gray-50">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl">{field.type === "emoji" ? "😃" : field.type === "slider" ? "🎚️" : "🔤"}</span>
-                  <span className="font-bold text-lg">{field.label}</span>
-                  <span className="ml-2 px-2 py-0.5 rounded bg-gray-200 text-xs font-mono">{field.id}</span>
-                  <span className="ml-2 text-xs text-gray-500">{field.type.charAt(0).toUpperCase() + field.type.slice(1)}</span>
-                  <span className="ml-2 text-xs text-gray-500">• {field.section}</span>
-                  {field.required && <BadgeCheck className="w-4 h-4 text-green-500 ml-2" title="Required" />}
-                </div>
-                <div className="flex gap-2 mb-2">
-                  {field.shiftTypes && field.shiftTypes.map(s => (
-                    <span key={s} className={
-                      (s === "Day Shift" ? "bg-yellow-100 text-yellow-800" :
-                      s === "Night Shift" ? "bg-blue-100 text-blue-800" :
-                      s === "Evening Shift" ? "bg-orange-100 text-orange-800" :
-                      "bg-gray-100 text-gray-800") + " px-2 py-0.5 rounded text-xs font-semibold"
-                    }>{s}</span>
-                  ))}
-                </div>
-                {field.placeholder && (
-                  <div className="text-gray-500 text-sm mb-1">Placeholder Text: <span className="italic">"{field.placeholder}"</span></div>
-                )}
-                {field.options && field.options.length > 0 && (
-                  <div className="flex gap-2 mt-1">
-                    <span className="text-xs text-gray-500">Options:</span>
-                    {field.options.map((opt, i) => (
-                      <span key={i} className="bg-gray-200 px-2 py-0.5 rounded text-xs font-mono">{opt}</span>
+    <div className="max-w-4xl mx-auto py-8 px-2 sm:px-4">
+      <h1 className="text-3xl sm:text-4xl font-extrabold mb-6 text-[color:var(--primary-blue)] drop-shadow">Manager Settings</h1>
+      <div className="bg-white/80 rounded-2xl shadow-lg border border-blue-100 backdrop-blur-sm p-4 sm:p-6 mb-8">
+        <h2 className="text-xl font-bold mb-4 text-[color:var(--primary-blue)]">Form Fields</h2>
+        <div className="flex justify-end mb-4">
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-[var(--primary-blue)] to-[var(--primary-blue-light)] text-white rounded-2xl hover:from-[var(--primary-blue-light)] hover:to-[var(--primary-blue)] transition-all font-extrabold text-base shadow-lg tracking-wide"
+          >
+            <Plus className="w-5 h-5" /> Add Field
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm bg-white/80 rounded-2xl">
+            <thead>
+              <tr className="bg-[var(--soft-blue)]">
+                <th className="py-3 px-4 text-left rounded-tl-2xl">Label</th>
+                <th className="py-3 px-4 text-left">Type</th>
+                <th className="py-3 px-4 text-left">Required</th>
+                <th className="py-3 px-4 text-left">Shifts</th>
+                <th className="py-3 px-4 text-left">Options</th>
+                <th className="py-3 px-4 text-left rounded-tr-2xl">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fields.map((field) => (
+                <tr key={field.id} className="border-b last:border-none hover:bg-[var(--soft-blue)] transition">
+                  <td className="py-3 px-4 font-medium text-[color:var(--text-primary)] max-w-[180px] truncate">{field.label}</td>
+                  <td className="py-3 px-4 text-[color:var(--text-secondary)] capitalize">{field.type}</td>
+                  <td className="py-3 px-4">{field.required ? <span className="text-green-600 font-bold">Yes</span> : <span className="text-gray-400">No</span>}</td>
+                  <td className="py-3 px-4 flex flex-wrap gap-1">
+                    {(field.shiftTypes || ["Day Shift", "Night Shift", "Evening Shift"]).map(type => (
+                      <span key={type} className={
+                        type === "Day Shift"
+                          ? "bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-semibold"
+                          : type === "Night Shift"
+                          ? "bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-semibold"
+                          : type === "Evening Shift"
+                          ? "bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full text-xs font-semibold"
+                          : "bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full text-xs font-semibold"
+                      }>{type.replace(" Shift", "")}</span>
                     ))}
-                  </div>
-                )}
-                <div className="flex gap-2 mt-3">
-                  <button className="px-3 py-1 bg-gray-200 rounded flex items-center gap-1 text-sm hover:bg-gray-300" onClick={() => handleEdit(field)}>
-                    <Pencil className="w-4 h-4" /> Edit
-                  </button>
-                  <button className="px-3 py-1 bg-red-100 text-red-700 rounded flex items-center gap-1 text-sm hover:bg-red-200" onClick={() => handleDelete(field)}>
-                    <Trash2 className="w-4 h-4" /> Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                  </td>
+                  <td className="py-3 px-4 max-w-[180px] truncate">
+                    {field.type === "dropdown" || field.type === "emoji"
+                      ? (field.options || []).join(", ")
+                      : "-"}
+                  </td>
+                  <td className="py-3 px-4 flex gap-2">
+                    <button onClick={() => handleEdit(field)} className="p-1 rounded hover:bg-[var(--soft-blue)] text-[var(--primary-blue)]" title="Edit"><Pencil className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(field)} className="p-1 rounded hover:bg-red-100 text-red-600" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+      {modalOpen && (
+        <FieldModal open={modalOpen} onClose={() => setModalOpen(false)} onSave={handleSave} initial={editField} />
+      )}
     </div>
   );
 } 

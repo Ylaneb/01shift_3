@@ -11,7 +11,7 @@ export default function ShiftCard({ icon, shiftType, date, onCompleteReport }) {
         </div>
       </div>
       <button
-        className="px-5 py-2 bg-white/30 text-white font-semibold rounded-lg hover:bg-white/50 transition"
+        className="px-6 py-2 rounded-[16px] bg-gradient-to-r from-[#E3E8FF] to-[#D6F0FF] text-[#6C63FF] font-bold shadow-[0_4px_16px_0_rgba(60,60,120,0.10)] shadow-inner border-none outline-none transition-all duration-200 active:scale-95 hover:from-[#D6F0FF] hover:to-[#E3E8FF] hover:shadow-[0_6px_24px_0_rgba(60,60,120,0.15)]"
         onClick={onCompleteReport}
       >
         + Complete Report

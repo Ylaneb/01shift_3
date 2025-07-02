@@ -4,7 +4,6 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import LoginButton from "./auth/LoginButton";
-import ShiftReportsList from "./pages/ShiftReportsList";
 import NewShiftReportForm from "./pages/NewShiftReportForm";
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
@@ -15,7 +14,17 @@ function App() {
   const [refreshReports, setRefreshReports] = useState(false);
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 text-[color:var(--text-primary)]">
+        <style>{`
+          :root {
+            --primary-blue: #2563eb;
+            --primary-blue-light: #3b82f6;
+            --accent-blue: #1e40af;
+            --soft-blue: #dbeafe;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+          }
+        `}</style>
         <header className="flex justify-between items-center p-4 bg-white/80 shadow">
           <nav className="flex gap-4">
             <Link to="/" className="font-semibold hover:underline">Dashboard</Link>

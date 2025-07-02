@@ -2,15 +2,23 @@ import React, { useState, useEffect } from "react";
 import { createShiftReport } from "../api/shiftReports";
 import { useAuth } from "../auth/AuthContext";
 import { getAllFormFields } from "../api/formFields";
-import { Star } from "lucide-react";
+import { Star, Home } from "lucide-react";
 
-export default function NewShiftReportForm({ onCreated }) {
+const PATIENTS_BY_HOUSE = {
+  1: ["Alice", "Bob"],
+  2: ["Charlie", "Diana"],
+  3: ["Eve", "Frank"],
+};
+
+export default function NewShiftReportForm({ onCreated, initialShiftType }) {
   const [fields, setFields] = useState([]);
   const [form, setForm] = useState({
-    shiftType: "Day Shift",
+    shiftType: initialShiftType || "Day Shift",
     house: "",
     patientName: "",
     shiftDate: "",
+    notes: "",
+    incidentStatus: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -28,6 +36,13 @@ export default function NewShiftReportForm({ onCreated }) {
     }
     fetchFields();
   }, []);
+
+  // Update shiftType if initialShiftType changes
+  useEffect(() => {
+    if (initialShiftType) {
+      setForm(f => ({ ...f, shiftType: initialShiftType }));
+    }
+  }, [initialShiftType]);
 
   const handleChange = (e, field) => {
     setForm({ ...form, [field?.id || e.target.name]: e.target.value });
@@ -51,19 +66,25 @@ export default function NewShiftReportForm({ onCreated }) {
     setLoading(false);
   };
 
+  // Filter fields by shiftType
+  const visibleFields = fields.filter(field => {
+    if (!field.shiftTypes || field.shiftTypes.length === 0) return true;
+    return field.shiftTypes.includes(form.shiftType);
+  });
+
   if (fieldsLoading) return <div className="p-4">Loading form...</div>;
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded shadow p-4 mb-4 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-2">New Shift Report</h2>
-      <div className="mb-4 space-y-2">
+    <form onSubmit={handleSubmit} className="bg-white/80 rounded-2xl shadow-lg border border-blue-100 backdrop-blur-sm p-4 sm:p-6 mb-4 max-w-md mx-auto max-h-[80vh] overflow-y-auto flex flex-col gap-4">
+      <h2 className="text-xl sm:text-2xl font-extrabold mb-2 text-[color:var(--primary-blue)] tracking-tight">New Shift Report</h2>
+      <div className="mb-2 space-y-3">
         <div>
-          <label className="block mb-1 font-medium">Shift Type</label>
+          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Shift Type</label>
           <select
             name="shiftType"
             value={form.shiftType}
             onChange={handleChange}
-            className="w-full border rounded p-2"
+            className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
             required
           >
             <option value="Day Shift">Day Shift</option>
@@ -72,42 +93,65 @@ export default function NewShiftReportForm({ onCreated }) {
           </select>
         </div>
         <div>
-          <label className="block mb-1 font-medium">House</label>
-          <input
-            type="text"
-            name="house"
-            value={form.house}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
-          />
+          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">House</label>
+          <div className="flex gap-3 mb-2">
+            {[1, 2, 3].map(num => (
+              <button
+                type="button"
+                key={num}
+                className={`flex flex-col items-center justify-center px-4 py-2 rounded-2xl border-2 transition-all duration-150 focus:outline-none text-[color:var(--primary-blue)] bg-white/80 shadow-sm hover:shadow-md ${form.house === String(num) ? "border-[var(--primary-blue)] bg-[var(--soft-blue)] font-extrabold ring-2 ring-[var(--primary-blue)] scale-105" : "border-blue-100 font-normal hover:bg-blue-50"}`}
+                onClick={() => setForm(f => ({ ...f, house: String(num), patientName: "" }))}
+                aria-pressed={form.house === String(num)}
+              >
+                <Home className={`w-7 h-7 mb-1 ${form.house === String(num) ? "text-[var(--primary-blue)]" : "text-blue-200"}`} />
+                <span className={`font-bold text-lg ${form.house === String(num) ? "font-extrabold" : "font-normal"}`}>{num}</span>
+              </button>
+            ))}
+          </div>
         </div>
         <div>
-          <label className="block mb-1 font-medium">Patient Name</label>
-          <input
-            type="text"
+          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Patient Name</label>
+          <select
             name="patientName"
             value={form.patientName}
             onChange={handleChange}
-            className="w-full border rounded p-2"
+            className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
             required
+            disabled={!form.house}
+          >
+            <option value="" disabled>{form.house ? "Select patient..." : "Select house first"}</option>
+            {(PATIENTS_BY_HOUSE[form.house] || []).map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-2 flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="incidentStatus"
+            checked={!!form.incidentStatus}
+            onChange={e => setForm(f => ({ ...f, incidentStatus: e.target.checked }))}
+            className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
+            id="incidentStatus"
           />
+          <label htmlFor="incidentStatus" className="font-semibold text-[color:var(--text-primary)]">Incident</label>
         </div>
         <div>
-          <label className="block mb-1 font-medium">Date</label>
+          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Date</label>
           <input
             type="date"
             name="shiftDate"
             value={form.shiftDate}
             onChange={handleChange}
-            className="w-full border rounded p-2"
+            className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
             required
           />
         </div>
       </div>
-      {fields.map(field => (
+      {/* Dynamic fields */}
+      {visibleFields.map(field => (
         <div className="mb-2" key={field.id}>
-          <label className="block mb-1 font-medium">
+          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">
             {field.label}
             {field.required && <span className="text-red-500 ml-1">*</span>}
           </label>
@@ -117,7 +161,7 @@ export default function NewShiftReportForm({ onCreated }) {
               name={field.id}
               value={form[field.id] || ""}
               onChange={e => handleChange(e, field)}
-              className="w-full border rounded p-2"
+              className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
               placeholder={field.placeholder}
               required={field.required}
             />
@@ -129,7 +173,7 @@ export default function NewShiftReportForm({ onCreated }) {
                 name={field.id}
                 checked={!!form[field.id]}
                 onChange={e => setForm({ ...form, [field.id]: e.target.checked })}
-                className="h-5 w-5"
+                className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
               />
               <span>{form[field.id] ? "Yes" : "No"}</span>
             </div>
@@ -139,7 +183,7 @@ export default function NewShiftReportForm({ onCreated }) {
               name={field.id}
               value={form[field.id] || ""}
               onChange={e => handleChange(e, field)}
-              className="w-full border rounded p-2"
+              className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
               required={field.required}
             >
               <option value="" disabled>Select...</option>
@@ -157,7 +201,7 @@ export default function NewShiftReportForm({ onCreated }) {
                 <button
                   type="button"
                   key={opt}
-                  className={`text-2xl px-2 py-1 rounded transition font-bold ${form[field.id] === opt ? "bg-blue-100 font-extrabold ring-2 ring-blue-400" : "bg-gray-100 font-normal"}`}
+                  className={`text-2xl px-2 py-1 rounded-xl transition font-bold border-2 ${form[field.id] === opt ? "bg-[var(--soft-blue)] font-extrabold ring-2 ring-[var(--primary-blue)] border-[var(--primary-blue)] scale-110" : "bg-gray-100 font-normal border-blue-100 hover:bg-blue-50"}`}
                   onClick={() => setForm({ ...form, [field.id]: opt })}
                   tabIndex={0}
                 >
@@ -175,7 +219,7 @@ export default function NewShiftReportForm({ onCreated }) {
                 max={field.max ?? 10}
                 value={form[field.id] || field.min || 0}
                 onChange={e => handleChange(e, field)}
-                className="w-full"
+                className="w-full accent-[var(--primary-blue)]"
               />
               <span>{form[field.id]}</span>
             </div>
@@ -198,9 +242,20 @@ export default function NewShiftReportForm({ onCreated }) {
           )}
         </div>
       ))}
+      {/* Notes field at the end */}
+      <div className="mb-2">
+        <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Notes <span className="text-gray-400 text-xs">(optional)</span></label>
+        <textarea
+          name="notes"
+          value={form.notes}
+          onChange={handleChange}
+          className="w-full border border-blue-100 rounded-xl p-2 min-h-[60px] focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
+          placeholder="Add any additional notes..."
+        />
+      </div>
       {error && <div className="text-red-500 mb-2">{error}</div>}
-      <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors" disabled={loading}>
-        {loading ? "Submitting..." : "Submit Report"}
+      <button type="submit" className="px-4 py-2 bg-gradient-to-br from-[var(--primary-blue)] to-[var(--primary-blue-light)] text-white rounded-2xl hover:from-[var(--primary-blue-light)] hover:to-[var(--primary-blue)] transition-all font-extrabold text-base sm:text-lg shadow-lg tracking-wide mt-2 disabled:opacity-60 disabled:cursor-not-allowed" disabled={loading}>
+        {loading ? "Saving..." : "Submit Report"}
       </button>
     </form>
   );
