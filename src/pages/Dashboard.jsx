@@ -8,6 +8,8 @@ import NewShiftReportForm from "./NewShiftReportForm";
 import { Sun, CalendarDays, TrendingUp, FileText, AlertCircle, Moon, CloudSun } from "lucide-react";
 import ReportList from "../components/ReportList";
 import ReportModal from "../components/ReportModal";
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 function formatDate(dateStr) {
   if (!dateStr) return "";
@@ -23,6 +25,7 @@ function ShiftIcon({ type }) {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [reports, setReports] = useState([]);
   const [users, setUsers] = useState({});
@@ -31,6 +34,7 @@ export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [fields, setFields] = useState([]);
+  const [lang, setLang] = useState(i18n.language);
 
   useEffect(() => {
     async function fetchReportsAndUsers() {
@@ -56,6 +60,12 @@ export default function Dashboard() {
       mod.getAllFormFields().then(setFields);
     });
   }, []);
+
+  // Language switcher handler
+  const handleLangChange = (lng) => {
+    i18n.changeLanguage(lng);
+    setLang(lng);
+  };
 
   // Stats
   const reportsThisWeek = reports.filter(r => {
@@ -106,9 +116,11 @@ export default function Dashboard() {
   const dynamicShift = getCurrentShiftByTime();
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-2 sm:px-4">
-      <h1 className="text-3xl sm:text-4xl font-extrabold mb-2 text-[color:var(--primary-blue)] drop-shadow">Welcome back{user ? `, ${user.displayName?.split(" ")[0]}!` : "!"}</h1>
-      <p className="text-[color:var(--text-secondary)] mb-6 text-base sm:text-lg">Ready to complete your shift report?</p>
+    <div className="max-w-4xl w-full mx-auto py-8 px-2 sm:px-4">
+      <h1 className="text-3xl sm:text-4xl font-extrabold mb-2 text-[color:var(--primary-blue)] drop-shadow">
+        {t('dashboard.welcome')}{user ? `, ${user.displayName?.split(" ")[0]}!` : "!"}
+      </h1>
+      <p className="text-[color:var(--text-secondary)] mb-6 text-base sm:text-lg">{t('dashboard.ready')}</p>
 
       <div className={`rounded-2xl shadow-lg bg-gradient-to-br from-[var(--soft-blue)] to-white/80 backdrop-blur-sm border border-blue-100 mb-8 p-1 transition-all duration-200`}> 
         <ShiftCard
@@ -120,10 +132,10 @@ export default function Dashboard() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg relative backdrop-blur-sm border border-blue-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-2 sm:px-0">
+          <div className="bg-white rounded-2xl shadow-lg p-2 sm:p-6 w-full max-w-xs sm:max-w-lg relative backdrop-blur-sm border border-blue-100">
             <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl"
+              className="absolute top-2 right-2 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 text-2xl rounded-full focus:outline-none focus:ring-2 focus:ring-blue-200"
               onClick={() => setShowForm(false)}
               aria-label="Close"
             >
@@ -137,17 +149,24 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-10">
-        <StatCard icon={<CalendarDays />} label="Reports This Week" value={reportsThisWeek} color="bg-[var(--soft-blue)]" />
-        <StatCard icon={<TrendingUp />} label="Reports This Month" value={reportsThisMonth} color="bg-green-50" />
-        <StatCard icon={<FileText />} label="Total Reports" value={totalReports} color="bg-indigo-50" />
-        <StatCard icon={<AlertCircle />} label="Total Incidents" value={totalIncidents} color="bg-red-50" />
+      {/* Mobile: 4 small squares inline, icon+number only; sm+: normal grid with label */}
+      <div className="flex sm:hidden gap-2 mb-10">
+        <div className="flex-1"><StatCard icon={<CalendarDays />} value={reportsThisWeek} color="bg-[var(--soft-blue)]" small /></div>
+        <div className="flex-1"><StatCard icon={<TrendingUp />} value={reportsThisMonth} color="bg-green-50" small /></div>
+        <div className="flex-1"><StatCard icon={<FileText />} value={totalReports} color="bg-indigo-50" small /></div>
+        <div className="flex-1"><StatCard icon={<AlertCircle />} value={totalIncidents} color="bg-red-50" small /></div>
+      </div>
+      <div className="hidden sm:grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-10">
+        <StatCard icon={<CalendarDays />} label={t('dashboard.reportsThisWeek')} value={reportsThisWeek} color="bg-[var(--soft-blue)]" />
+        <StatCard icon={<TrendingUp />} label={t('dashboard.reportsThisMonth')} value={reportsThisMonth} color="bg-green-50" />
+        <StatCard icon={<FileText />} label={t('dashboard.totalReports')} value={totalReports} color="bg-indigo-50" />
+        <StatCard icon={<AlertCircle />} label={t('dashboard.totalIncidents')} value={totalIncidents} color="bg-red-50" />
       </div>
 
-      <div className="bg-white/80 rounded-2xl shadow-lg border border-blue-100 backdrop-blur-sm p-4 sm:p-6">
+      <div className="bg-white/80 rounded-2xl shadow-lg border border-blue-100 backdrop-blur-sm p-2 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-          <h2 className="text-lg sm:text-xl font-bold text-[color:var(--primary-blue)]">Recent Reports</h2>
-          <a href="/reports" className="text-[color:var(--primary-blue)] hover:underline text-sm font-medium">View All</a>
+          <h2 className="text-lg sm:text-xl font-bold text-[color:var(--primary-blue)]">{t('dashboard.recentReports')}</h2>
+          <a href="/reports" className="text-[color:var(--primary-blue)] hover:underline text-sm font-medium">{t('dashboard.viewAll')}</a>
         </div>
         <ReportList
           reports={recentReports}

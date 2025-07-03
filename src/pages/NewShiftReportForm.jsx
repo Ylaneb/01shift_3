@@ -3,14 +3,18 @@ import { createShiftReport } from "../api/shiftReports";
 import { useAuth } from "../auth/AuthContext";
 import { getAllFormFields } from "../api/formFields";
 import { Star, Home } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 const PATIENTS_BY_HOUSE = {
-  1: ["Alice", "Bob"],
-  2: ["Charlie", "Diana"],
-  3: ["Eve", "Frank"],
+  1: ["רפאל", "יוסף", "שלמה", "אלי", "אייל", "ירון"],
+  2: ["אדם יעקב", "יוסף", "מנחם", "מרדכי", "שי אריאל", "שמעון"],
+  3: ["אהרן", "גד", "רובין", "אברהם", "שחר", "יהודה"],
+  4: ["מאיר", "אושרי", "יאיר", "אביאל", "בן ציון", "משה"],
+  5: ["דן", "יהושע", "דוד", "אורי", "ליאב", "סטיב", "ז'וליאן", "פרנק", "נאור", "דוד", "ברונו", "בנימין"],
 };
 
 export default function NewShiftReportForm({ onCreated, initialShiftType }) {
+  const { t } = useTranslation();
   const [fields, setFields] = useState([]);
   const [form, setForm] = useState({
     shiftType: initialShiftType || "Day Shift",
@@ -72,14 +76,14 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
     return field.shiftTypes.includes(form.shiftType);
   });
 
-  if (fieldsLoading) return <div className="p-4">Loading form...</div>;
+  if (fieldsLoading) return <div className="p-4">{t('newReport.loading')}</div>;
 
   return (
     <form onSubmit={handleSubmit} className="bg-white/80 rounded-2xl shadow-lg border border-blue-100 backdrop-blur-sm p-4 sm:p-6 mb-4 max-w-md mx-auto max-h-[80vh] overflow-y-auto flex flex-col gap-4">
-      <h2 className="text-xl sm:text-2xl font-extrabold mb-2 text-[color:var(--primary-blue)] tracking-tight">New Shift Report</h2>
+      <h2 className="text-xl sm:text-2xl font-extrabold mb-2 text-[color:var(--primary-blue)] tracking-tight">{t('newReport.title')}</h2>
       <div className="mb-2 space-y-3">
         <div>
-          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Shift Type</label>
+          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">{t('newReport.shiftType')}</label>
           <select
             name="shiftType"
             value={form.shiftType}
@@ -87,30 +91,32 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
             className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
             required
           >
-            <option value="Day Shift">Day Shift</option>
-            <option value="Night Shift">Night Shift</option>
-            <option value="Evening Shift">Evening Shift</option>
+            <option value="Day Shift">{t('shiftTypes.Day_Shift')}</option>
+            <option value="Night Shift">{t('shiftTypes.Night_Shift')}</option>
+            <option value="Evening Shift">{t('shiftTypes.Evening_Shift')}</option>
           </select>
         </div>
         <div>
-          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">House</label>
+          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">{t('newReport.house')}</label>
           <div className="flex gap-3 mb-2">
-            {[1, 2, 3].map(num => (
+            {[1, 2, 3, 4, 5].map(num => (
               <button
                 type="button"
                 key={num}
-                className={`flex flex-col items-center justify-center px-4 py-2 rounded-2xl border-2 transition-all duration-150 focus:outline-none text-[color:var(--primary-blue)] bg-white/80 shadow-sm hover:shadow-md ${form.house === String(num) ? "border-[var(--primary-blue)] bg-[var(--soft-blue)] font-extrabold ring-2 ring-[var(--primary-blue)] scale-105" : "border-blue-100 font-normal hover:bg-blue-50"}`}
+                className={`flex flex-col items-center justify-center px-4 sm:px-6 py-2 rounded-[16px] font-bold transition-all duration-150 ${form.house === String(num)
+                  ? 'bg-gradient-to-r from-[#E3E8FF] to-[#D6F0FF] text-[#6C63FF] scale-105 shadow-[0_4px_16px_0_rgba(60,60,120,0.10)] shadow-inner border-2 border-[var(--primary-blue)] ring-2 ring-[var(--primary-blue)]'
+                  : 'bg-gray-100 text-gray-700 border-2 border-blue-100 hover:bg-blue-50'}`}
                 onClick={() => setForm(f => ({ ...f, house: String(num), patientName: "" }))}
                 aria-pressed={form.house === String(num)}
               >
-                <Home className={`w-7 h-7 mb-1 ${form.house === String(num) ? "text-[var(--primary-blue)]" : "text-blue-200"}`} />
+                <Home className={`w-7 h-7 mb-1 ${form.house === String(num) ? "text-[#6C63FF]" : "text-blue-200"}`} />
                 <span className={`font-bold text-lg ${form.house === String(num) ? "font-extrabold" : "font-normal"}`}>{num}</span>
               </button>
             ))}
           </div>
         </div>
         <div>
-          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Patient Name</label>
+          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">{t('newReport.patientName')}</label>
           <select
             name="patientName"
             value={form.patientName}
@@ -119,7 +125,7 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
             required
             disabled={!form.house}
           >
-            <option value="" disabled>{form.house ? "Select patient..." : "Select house first"}</option>
+            <option value="" disabled>{form.house ? t('newReport.selectPatient') : t('newReport.selectHouseFirst')}</option>
             {(PATIENTS_BY_HOUSE[form.house] || []).map(name => (
               <option key={name} value={name}>{name}</option>
             ))}
@@ -134,10 +140,10 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
             className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
             id="incidentStatus"
           />
-          <label htmlFor="incidentStatus" className="font-semibold text-[color:var(--text-primary)]">Incident</label>
+          <label htmlFor="incidentStatus" className="font-semibold text-[color:var(--text-primary)]">{t('newReport.incident')}</label>
         </div>
         <div>
-          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Date</label>
+          <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">{t('newReport.date')}</label>
           <input
             type="date"
             name="shiftDate"
@@ -162,7 +168,7 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
               value={form[field.id] || ""}
               onChange={e => handleChange(e, field)}
               className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
-              placeholder={field.placeholder}
+              placeholder={field.placeholder || t('newReport.textPlaceholder')}
               required={field.required}
             />
           )}
@@ -175,7 +181,7 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
                 onChange={e => setForm({ ...form, [field.id]: e.target.checked })}
                 className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
               />
-              <span>{form[field.id] ? "Yes" : "No"}</span>
+              <span>{form[field.id] ? t('newReport.yes') : t('newReport.no')}</span>
             </div>
           )}
           {field.type === "dropdown" && (
@@ -186,8 +192,8 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
               className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
               required={field.required}
             >
-              <option value="" disabled>Select...</option>
-              {(field.options && field.options.length > 0 ? field.options : ["Option 1", "Option 2", "Option 3"]).map(opt => (
+              <option value="" disabled>{t('newReport.selectOption')}</option>
+              {(field.options && field.options.length > 0 ? field.options : [t('newReport.option1'), t('newReport.option2'), t('newReport.option3')]).map(opt => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
@@ -196,12 +202,14 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
             <div className="flex gap-2">
               {(Array.isArray(field.options) && field.options.length > 0
                 ? field.options
-                : ["😢", "🙁", "😐", "🙂", "😃"]
+                : ["😢", "🙁", "😐", "🙂", "��"]
               ).map(opt => (
                 <button
                   type="button"
                   key={opt}
-                  className={`text-2xl px-2 py-1 rounded-xl transition font-bold border-2 ${form[field.id] === opt ? "bg-[var(--soft-blue)] font-extrabold ring-2 ring-[var(--primary-blue)] border-[var(--primary-blue)] scale-110" : "bg-gray-100 font-normal border-blue-100 hover:bg-blue-50"}`}
+                  className={`text-2xl px-4 sm:px-6 py-2 rounded-[16px] font-bold transition-all duration-150 ${form[field.id] === opt
+                    ? 'bg-gradient-to-r from-[#E3E8FF] to-[#D6F0FF] text-[#6C63FF] scale-110 shadow-[0_4px_16px_0_rgba(60,60,120,0.10)] shadow-inner border-2 border-[var(--primary-blue)] ring-2 ring-[var(--primary-blue)]'
+                    : 'bg-gray-100 text-gray-700 border-2 border-blue-100 hover:bg-blue-50'}`}
                   onClick={() => setForm({ ...form, [field.id]: opt })}
                   tabIndex={0}
                 >
@@ -230,7 +238,9 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
                 <button
                   type="button"
                   key={star}
-                  className="focus:outline-none"
+                  className={`px-4 sm:px-6 py-2 rounded-[16px] font-bold transition-all duration-150 focus:outline-none ${form[field.id] >= star
+                    ? 'bg-gradient-to-r from-[#E3E8FF] to-[#D6F0FF] text-[#6C63FF] shadow-[0_4px_16px_0_rgba(60,60,120,0.10)] shadow-inner scale-110'
+                    : 'bg-gray-100 text-gray-700 hover:bg-blue-50'}`}
                   onClick={() => setForm({ ...form, [field.id]: star })}
                   aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                 >
@@ -244,18 +254,18 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
       ))}
       {/* Notes field at the end */}
       <div className="mb-2">
-        <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">Notes <span className="text-gray-400 text-xs">(optional)</span></label>
+        <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">{t('newReport.notes')} <span className="text-gray-400 text-xs">({t('newReport.optional')})</span></label>
         <textarea
           name="notes"
           value={form.notes}
           onChange={handleChange}
           className="w-full border border-blue-100 rounded-xl p-2 min-h-[60px] focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
-          placeholder="Add any additional notes..."
+          placeholder={t('newReport.notesPlaceholder')}
         />
       </div>
-      {error && <div className="text-red-500 mb-2">{error}</div>}
-      <button type="submit" className="px-4 py-2 bg-gradient-to-br from-[var(--primary-blue)] to-[var(--primary-blue-light)] text-white rounded-2xl hover:from-[var(--primary-blue-light)] hover:to-[var(--primary-blue)] transition-all font-extrabold text-base sm:text-lg shadow-lg tracking-wide mt-2 disabled:opacity-60 disabled:cursor-not-allowed" disabled={loading}>
-        {loading ? "Saving..." : "Submit Report"}
+      {error && <div className="text-red-500 mb-2">{t('newReport.error')}</div>}
+      <button type="submit" className="px-4 sm:px-6 py-2 rounded-[16px] bg-gradient-to-r from-[#E3E8FF] to-[#D6F0FF] text-[#6C63FF] font-bold shadow-[0_4px_16px_0_rgba(60,60,120,0.10)] shadow-inner border-none outline-none transition-all duration-200 active:scale-95 hover:from-[#D6F0FF] hover:to-[#E3E8FF] hover:shadow-[0_6px_24px_0_rgba(60,60,120,0.15)] text-xs sm:text-base mt-2 disabled:opacity-60 disabled:cursor-not-allowed" disabled={loading}>
+        {loading ? t('newReport.saving') : t('newReport.submit')}
       </button>
     </form>
   );

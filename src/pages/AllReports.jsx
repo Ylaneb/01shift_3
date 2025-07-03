@@ -73,7 +73,7 @@ export default function AllReports() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-2 sm:px-4">
+    <div className="max-w-5xl w-full mx-auto py-8 px-2 sm:px-4">
       <h1 className="text-3xl sm:text-4xl font-extrabold mb-6 text-[color:var(--primary-blue)] drop-shadow">All Reports</h1>
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-2 items-end bg-white/80 rounded-2xl shadow-lg border border-blue-100 backdrop-blur-sm p-4">
