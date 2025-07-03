@@ -6,9 +6,17 @@ import { useTranslation } from 'react-i18next';
 
 const ROLE_ALLOWED = ["manager", "admin"];
 
+// Polyfill for crypto.randomUUID for older browsers
+function generateId() {
+  if (window.crypto && window.crypto.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+  // fallback: random string
+  return 'id_' + Math.random().toString(36).substr(2, 9);
+}
+
 const emptyField = {
   label: "",
-  id: "",
   type: "text",
   section: "General",
   required: false,
@@ -33,12 +41,7 @@ function FieldModal({ open, onClose, onSave, initial }) {
     setField(initial || emptyField);
   }, [initial, open]);
 
-  // Auto-generate ID from label (only for new fields)
-  useEffect(() => {
-    if (!initial) {
-      setField(f => ({ ...f, id: toId(f.label) }));
-    }
-  }, [field.label, initial]);
+  // Remove id from user input; ID will be generated on save
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -205,9 +208,10 @@ export default function Manager() {
   };
   const handleSave = async (field) => {
     if (editField) {
-      await updateFormField(field.id, field);
+      await updateFormField(editField.id, field);
     } else {
-      await createFormField(field.id, field);
+      const id = generateId();
+      await createFormField(id, field);
     }
     setModalOpen(false);
     refreshFields();
