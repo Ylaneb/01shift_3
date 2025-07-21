@@ -89,6 +89,7 @@
     "textPlaceholder": "Enter text...",
     "error": "Failed to create report.",
     "saving": "Saving...",
-    "submit": "Submit Report"
+    "submit": "Submit Report",
+    "success": "Report sent!"
   }
 } 

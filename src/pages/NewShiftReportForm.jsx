@@ -15,17 +15,19 @@ const PATIENTS_BY_HOUSE = {
 
 export default function NewShiftReportForm({ onCreated, initialShiftType }) {
   const { t } = useTranslation();
-  const [fields, setFields] = useState([]);
-  const [form, setForm] = useState({
+  const initialFormState = {
     shiftType: initialShiftType || "Day Shift",
     house: "",
     patientName: "",
-    shiftDate: "",
+    shiftDate: new Date().toISOString().slice(0, 10),
     notes: "",
     incidentStatus: false,
-  });
+  };
+  const [fields, setFields] = useState([]);
+  const [form, setForm] = useState(initialFormState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
   const { user } = useAuth();
   const [fieldsLoading, setFieldsLoading] = useState(true);
 
@@ -50,6 +52,7 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
 
   const handleChange = (e, field) => {
     setForm({ ...form, [field?.id || e.target.name]: e.target.value });
+    setSuccessMessage(""); // Clear success message on change
   };
 
   const handleSubmit = async (e) => {
@@ -63,7 +66,8 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
         userId: user.uid,
         submittedAt: new Date().toISOString(),
       });
-      if (onCreated) onCreated();
+      setForm({ ...initialFormState });
+      setSuccessMessage(t('newReport.success'));
     } catch (err) {
       setError("Failed to create report");
     }
@@ -92,8 +96,9 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
             required
           >
             <option value="Day Shift">{t('shiftTypes.Day_Shift')}</option>
-            <option value="Night Shift">{t('shiftTypes.Night_Shift')}</option>
             <option value="Evening Shift">{t('shiftTypes.Evening_Shift')}</option>
+            <option value="Night Shift">{t('shiftTypes.Night_Shift')}</option>
+            
           </select>
         </div>
         <div>
@@ -173,15 +178,39 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
             />
           )}
           {field.type === "yesno" && (
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name={field.id}
-                checked={!!form[field.id]}
-                onChange={e => setForm({ ...form, [field.id]: e.target.checked })}
-                className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
-              />
-              <span>{form[field.id] ? t('newReport.yes') : t('newReport.no')}</span>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  name={field.id + "_yes"}
+                  checked={form[field.id] !== undefined ? !!form[field.id] : true}
+                  onChange={e => {
+                    if (e.target.checked) {
+                      setForm({ ...form, [field.id]: true });
+                    } else {
+                      setForm({ ...form, [field.id]: undefined });
+                    }
+                  }}
+                  className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
+                />
+                <span>{t('newReport.yes')}</span>
+              </label>
+              <label className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  name={field.id + "_no"}
+                  checked={form[field.id] === false}
+                  onChange={e => {
+                    if (e.target.checked) {
+                      setForm({ ...form, [field.id]: false });
+                    } else {
+                      setForm({ ...form, [field.id]: undefined });
+                    }
+                  }}
+                  className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
+                />
+                <span>{t('newReport.no')}</span>
+              </label>
             </div>
           )}
           {field.type === "dropdown" && (
@@ -202,7 +231,7 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
             <div className="flex gap-2">
               {(Array.isArray(field.options) && field.options.length > 0
                 ? field.options
-                : ["😢", "🙁", "😐", "🙂", "��"]
+                : ["😢", "🙁", "😐", "🙂", "😊"]
               ).map(opt => (
                 <button
                   type="button"
@@ -267,6 +296,7 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
       <button type="submit" className="px-4 sm:px-6 py-2 rounded-[16px] bg-gradient-to-r from-[#E3E8FF] to-[#D6F0FF] text-[#6C63FF] font-bold shadow-[0_4px_16px_0_rgba(60,60,120,0.10)] shadow-inner border-none outline-none transition-all duration-200 active:scale-95 hover:from-[#D6F0FF] hover:to-[#E3E8FF] hover:shadow-[0_6px_24px_0_rgba(60,60,120,0.15)] text-xs sm:text-base mt-2 disabled:opacity-60 disabled:cursor-not-allowed" disabled={loading}>
         {loading ? t('newReport.saving') : t('newReport.submit')}
       </button>
+      {successMessage && <div className="text-green-600 mt-2 text-sm font-semibold">{successMessage}</div>}
     </form>
   );
 } 

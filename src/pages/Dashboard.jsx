@@ -5,7 +5,7 @@ import { getUser } from "../api/users";
 import StatCard from "../components/StatCard";
 import ShiftCard from "../components/ShiftCard";
 import NewShiftReportForm from "./NewShiftReportForm";
-import { Sun, CalendarDays, TrendingUp, FileText, AlertCircle, Moon, CloudSun } from "lucide-react";
+import { Sun, CalendarDays, TrendingUp, FileText, AlertCircle, Moon, CloudSun, Info, User, Mail, Phone, PhoneCall, MessageCircle, MessageSquare, Linkedin } from "lucide-react";
 import ReportList from "../components/ReportList";
 import ReportModal from "../components/ReportModal";
 import { useTranslation } from 'react-i18next';
@@ -35,6 +35,7 @@ export default function Dashboard() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [fields, setFields] = useState([]);
   const [lang, setLang] = useState(i18n.language);
+  const [showBusinessCard, setShowBusinessCard] = useState(false);
 
   useEffect(() => {
     async function fetchReportsAndUsers() {
@@ -116,7 +117,7 @@ export default function Dashboard() {
   const dynamicShift = getCurrentShiftByTime();
 
   return (
-    <div className="max-w-4xl w-full mx-auto py-8 px-2 sm:px-4">
+    <div className="max-w-4xl w-full mx-auto py-8 px-2 sm:px-4 min-h-screen flex flex-col">
       <h1 className="text-3xl sm:text-4xl font-extrabold mb-2 text-[color:var(--primary-blue)] drop-shadow">
         {t('dashboard.welcome')}{user ? `, ${user.displayName?.split(" ")[0]}!` : "!"}
       </h1>
@@ -184,6 +185,62 @@ export default function Dashboard() {
         user={users[selectedReport?.userId]}
         fields={fields}
       />
+      {/* Footer */}
+      <footer className="mt-auto flex flex-col sm:flex-row items-center justify-between gap-2 py-4 border-t border-blue-100 text-xs text-gray-500 bg-white/70">
+        <span>Association Name &copy; {new Date().getFullYear()} | All rights reserved</span>
+        <button
+          className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-50 transition text-[color:var(--primary-blue)]"
+          onClick={() => setShowBusinessCard(true)}
+          aria-label="Show business card"
+        >
+          <Info className="w-4 h-4" /> Info
+        </button>
+      </footer>
+      {/* Business Card Modal */}
+      {showBusinessCard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-gray-50 rounded-2xl shadow-lg p-6 w-full max-w-md relative flex flex-col items-center">
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl rounded-full focus:outline-none focus:ring-2 focus:ring-blue-200"
+              onClick={() => setShowBusinessCard(false)}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <div className="flex flex-col items-center gap-4 w-full">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white border-2 border-blue-200 mb-2">
+                <Info className="w-10 h-10 text-blue-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-900 mb-1">About the Author</div>
+              <div className="flex flex-col items-center gap-1 text-gray-700 w-full">
+                <div className="flex items-center gap-2 text-base font-medium">
+                  <User className="w-5 h-5 text-blue-600" />
+                  Ylane Bouchenino
+                </div>
+                <div className="flex items-center gap-2 text-base">
+                  <Mail className="w-5 h-5 text-blue-600" />
+                  <a href="mailto:ylaneb@gmail.com" className="text-blue-600 underline">ylaneb@gmail.com</a>
+                </div>
+                <div className="flex items-center gap-2 text-base">
+                  <Phone className="w-5 h-5 text-blue-600" />
+                  0529529613
+                  <a href="tel:0529529613" className="ml-1"><PhoneCall className="w-5 h-5 text-blue-600 hover:text-blue-800" title="Call" /></a>
+                  <a href="https://wa.me/972529529613" target="_blank" rel="noopener noreferrer"><MessageCircle className="w-5 h-5 text-blue-600 hover:text-green-600" title="WhatsApp" /></a>
+                  <a href="sms:0529529613"><MessageSquare className="w-5 h-5 text-blue-600 hover:text-blue-800" title="SMS" /></a>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <a href="https://www.linkedin.com/in/ylane-bouchenino-77318651" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+                    <Linkedin className="w-6 h-6" />
+                  </a>
+                </div>
+              </div>
+              <div className="text-xs text-gray-400 mt-4 w-full text-center">
+                &copy; {new Date().getFullYear()} Ylane Bouchenino. All rights reserved.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
