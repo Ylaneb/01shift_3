@@ -188,7 +188,7 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
                     if (e.target.checked) {
                       setForm({ ...form, [field.id]: true });
                     } else {
-                      setForm({ ...form, [field.id]: undefined });
+                      setForm({ ...form, [field.id]: false });
                     }
                   }}
                   className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
@@ -204,7 +204,7 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
                     if (e.target.checked) {
                       setForm({ ...form, [field.id]: false });
                     } else {
-                      setForm({ ...form, [field.id]: undefined });
+                      setForm({ ...form, [field.id]: true });
                     }
                   }}
                   className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
@@ -299,4 +299,4 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
       {successMessage && <div className="text-green-600 mt-2 text-sm font-semibold">{successMessage}</div>}
     </form>
   );
-} 
+}
