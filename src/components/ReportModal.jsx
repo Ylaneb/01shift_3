@@ -36,6 +36,12 @@ const systemFields = [
 
 export default function ReportModal({ open, onClose, report, user, fields }) {
   if (!open || !report) return null;
+
+  const visibleFields = fields.filter(field => {
+    if (!field.shiftTypes || field.shiftTypes.length === 0) return true;
+    return field.shiftTypes.includes(report.shiftType);
+  });
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 print:bg-transparent print:relative print:inset-auto print:z-auto">
       <div className="bg-white rounded-xl shadow-lg p-3 sm:p-6 w-full max-w-xs sm:max-w-lg relative print:shadow-none print:p-4 print:max-w-full max-h-[90vh] overflow-y-auto">
@@ -53,7 +59,7 @@ export default function ReportModal({ open, onClose, report, user, fields }) {
             </div>
           ))}
           {/* Dynamic fields */}
-          {fields.map(field => (
+          {visibleFields.map(field => (
             <div key={field.id} className="flex justify-between border-b pb-1 text-xs sm:text-base">
               <span className="font-medium">{field.label}</span>
               {renderFieldValue(field, report[field.id])}

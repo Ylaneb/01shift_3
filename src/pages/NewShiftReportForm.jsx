@@ -181,33 +181,21 @@ export default function NewShiftReportForm({ onCreated, initialShiftType }) {
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-1">
                 <input
-                  type="checkbox"
-                  name={field.id + "_yes"}
-                  checked={form[field.id] !== undefined ? !!form[field.id] : true}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      setForm({ ...form, [field.id]: true });
-                    } else {
-                      setForm({ ...form, [field.id]: false });
-                    }
-                  }}
-                  className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
+                  type="radio"
+                  name={field.id}
+                  checked={form[field.id] === true}
+                  onChange={() => setForm({ ...form, [field.id]: true })}
+                  className="h-5 w-5 border-blue-100 rounded-full focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
                 />
                 <span>{t('newReport.yes')}</span>
               </label>
               <label className="flex items-center gap-1">
                 <input
-                  type="checkbox"
-                  name={field.id + "_no"}
+                  type="radio"
+                  name={field.id}
                   checked={form[field.id] === false}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      setForm({ ...form, [field.id]: false });
-                    } else {
-                      setForm({ ...form, [field.id]: true });
-                    }
-                  }}
-                  className="h-5 w-5 border-blue-100 rounded focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
+                  onChange={() => setForm({ ...form, [field.id]: false })}
+                  className="h-5 w-5 border-blue-100 rounded-full focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none"
                 />
                 <span>{t('newReport.no')}</span>
               </label>

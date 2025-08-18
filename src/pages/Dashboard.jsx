@@ -108,7 +108,7 @@ export default function Dashboard() {
     } else {
       return {
         shiftType: "Night Shift",
-        gradient: "bg-gradient-to-r from-[#B5C6E0] to-[#232526]",
+        gradient: "bg-gradient-to-r from-[#E3E8FF] to-[#D6F0FF]",
         icon: <Moon className="text-blue-700" />,
       };
     }

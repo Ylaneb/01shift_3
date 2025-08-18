@@ -22,17 +22,7 @@ function App() {
   };
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 text-[color:var(--text-primary)]">
-        <style>{`
-          :root {
-            --primary-blue: #2563eb;
-            --primary-blue-light: #3b82f6;
-            --accent-blue: #1e40af;
-            --soft-blue: #dbeafe;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-          }
-        `}</style>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 text-gray-800">
         <header className="flex justify-between items-center p-4 bg-white/80 shadow relative">
           {/* Hamburger for mobile */}
           <button
