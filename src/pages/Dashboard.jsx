@@ -132,23 +132,12 @@ export default function Dashboard() {
         />
       </div>
 
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-2 sm:px-0">
-          <div className="bg-white rounded-2xl shadow-lg p-2 sm:p-6 w-full max-w-xs sm:max-w-lg relative backdrop-blur-sm border border-blue-100">
-            <button
-              className="absolute top-2 right-2 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 text-2xl rounded-full focus:outline-none focus:ring-2 focus:ring-blue-200"
-              onClick={() => setShowForm(false)}
-              aria-label="Close"
-            >
-              &times;
-            </button>
-            <NewShiftReportForm
-              initialShiftType={dynamicShift.shiftType}
-              onCreated={() => setShowForm(false)}
-            />
-          </div>
-        </div>
-      )}
+      <NewShiftReportForm
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        initialShiftType={dynamicShift.shiftType}
+        onCreated={() => setShowForm(false)}
+      />
 
       {/* Mobile: 4 small squares inline, icon+number only; sm+: normal grid with label */}
       <div className="flex sm:hidden gap-2 mb-10">
