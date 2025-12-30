@@ -7,7 +7,8 @@
     "totalReports": "Total Reports",
     "totalIncidents": "Total Incidents",
     "recentReports": "Recent Reports",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "houses": "Houses"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -18,6 +19,13 @@
     "completeReport": "Complete Report",
     "logout": "Logout",
     "signIn": "Sign in with Google"
+  },
+  "auth": {
+    "loginRequired": "Login Required",
+    "loginDescription": "Please sign in to access the shift reporting system.",
+    "signInWithGoogle": "Sign in with Google",
+    "loggingIn": "Signing in...",
+    "loginInfo": "You need to be authenticated to use this application."
   },
   "shiftTypes": {
     "Day_Shift": "Day Shift",
@@ -70,6 +78,11 @@
   "newReport": {
     "title": "New Shift Report",
     "loading": "Loading form...",
+    "educator": "Educator",
+    "selectEducator": "Select educator...",
+    "educatorOther": "Other (type name)",
+    "educatorOtherPlaceholder": "Enter educator name",
+    "educatorRequired": "Please enter the educator name.",
     "shiftType": "Shift Type",
     "house": "House",
     "patientName": "Patient Name",

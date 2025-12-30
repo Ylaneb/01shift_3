@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@heroui/react": "^2.8.0",
+    "@heroui/spacer": "^2.2.21",
     "@tailwindcss/vite": "^4.1.11",
     "clsx": "^2.1.1",
     "firebase": "^11.10.0",

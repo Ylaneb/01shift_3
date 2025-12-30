@@ -7,7 +7,8 @@
     "totalReports": "סך כל הדוחות",
     "totalIncidents": "סך כל התקריות",
     "recentReports": "דוחות אחרונים",
-    "viewAll": "הצג הכל"
+    "viewAll": "הצג הכל",
+    "houses": "בתים"
   },
   "nav": {
     "dashboard": "לוח בקרה",
@@ -18,6 +19,13 @@
     "completeReport": "השלם דוח",
     "logout": "התנתק",
     "signIn": "התחבר עם גוגל"
+  },
+  "auth": {
+    "loginRequired": "נדרש התחברות",
+    "loginDescription": "אנא התחבר כדי לגשת למערכת דוחות המשמרות.",
+    "signInWithGoogle": "התחבר עם Google",
+    "loggingIn": "מתחבר...",
+    "loginInfo": "עליך להיות מאומת כדי להשתמש באפליקציה זו."
   },
   "shiftTypes": {
     "Day_Shift": "משמרת יום",
@@ -70,6 +78,11 @@
   "newReport": {
     "title": "דוח משמרת חדש",
     "loading": "טוען טופס...",
+    "educator": "מדריך",
+    "selectEducator": "בחר מדריך...",
+    "educatorOther": "אחר (הזן שם)",
+    "educatorOtherPlaceholder": "הזן שם מדריך",
+    "educatorRequired": "אנא הזן את שם המדריך.",
     "shiftType": "סוג משמרת",
     "house": "בית",
     "patientName": "שם מטופל",

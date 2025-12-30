@@ -12,10 +12,61 @@ const PATIENTS_BY_HOUSE = {
   4: ["מאיר", "אושרי", "יאיר", "אביאל", "בן ציון", "משה"],
   5: ["דן", "יהושע", "דוד", "אורי", "ליאב", "סטיב", "ז'וליאן", "פרנק", "נאור", "דוד", "ברונו", "בנימין"],
 };
+const EDUCATORS = [
+  "מוטי",
+  "איציק",
+  "אילן",
+  "דבורה",
+  "אמיר",
+  "נטלי",
+  "כרמלה",
+  "זומר",
+  "דוד",
+  "ג'ררד של",
+  "אלכס",
+  "סטיבן",
+  "אליוט",
+  "הארי",
+  "יהושע",
+  "ישראל",
+  "משה",
+  "אהרון",
+  "אברהם",
+  "חי בן שלום",
+  "יונתן",
+  "יצחק",
+  "יוהן",
+  "דניאל",
+  "ישראל מאיר",
+  "אפי",
+  "קפלן",
+  "אליהו",
+  "שרה",
+  "אריאלה",
+  "ברברה",
+  "לינדה",
+  "קרין",
+  "אלישבע ד",
+  "אוליביה",
+  "אלכסנדר",
+  "קרן",
+  "חיה רחל",
+  "אצ'ש",
+  "רפאל",
+  "נעמה",
+  "שמואל",
+  "פיליפ שר",
+  "חנה",
+  "יעקב",
+  "ג'רלדין"
+];
+const OTHER_EDUCATOR_VALUE = "__other__";
 
 export default function NewShiftReportForm({ onCreated, initialShiftType, open, onClose }) {
   const { t } = useTranslation();
   const initialFormState = {
+    educator: "",
+    educatorOther: "",
     shiftType: initialShiftType || "Day Shift",
     house: "",
     patientName: "",
@@ -51,8 +102,22 @@ export default function NewShiftReportForm({ onCreated, initialShiftType, open, 
   }, [initialShiftType]);
 
   const handleChange = (e, field) => {
-    setForm({ ...form, [field?.id || e.target.name]: e.target.value });
+    const targetName = e?.target?.name;
+    const targetValue = e?.target?.value;
+
+    if (targetName === "educator") {
+      setForm(prev => ({
+        ...prev,
+        educator: targetValue,
+        educatorOther: targetValue === OTHER_EDUCATOR_VALUE ? prev.educatorOther : ""
+      }));
+    } else {
+      setForm(prev => ({ ...prev, [field?.id || targetName]: targetValue }));
+    }
     setSuccessMessage(""); // Clear success message on change
+    if (error) {
+      setError(null);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -61,15 +126,28 @@ export default function NewShiftReportForm({ onCreated, initialShiftType, open, 
     setLoading(true);
     setError(null);
     try {
+      const resolvedEducator = form.educator === OTHER_EDUCATOR_VALUE
+        ? form.educatorOther.trim()
+        : form.educator;
+
+      if (!resolvedEducator) {
+        setError(t('newReport.educatorRequired'));
+        setLoading(false);
+        return;
+      }
+
+      const { educatorOther, ...formWithoutOther } = form;
+
       await createShiftReport({
-        ...form,
+        ...formWithoutOther,
+        educator: resolvedEducator,
         userId: user.uid,
         submittedAt: new Date().toISOString(),
       });
       setForm({ ...initialFormState });
       setSuccessMessage(t('newReport.success'));
     } catch (err) {
-      setError("Failed to create report");
+      setError(t('newReport.error'));
     }
     setLoading(false);
   };
@@ -96,6 +174,33 @@ export default function NewShiftReportForm({ onCreated, initialShiftType, open, 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <h2 className="text-xl sm:text-2xl font-extrabold mb-2 text-[color:var(--primary-blue)] tracking-tight">{t('newReport.title')}</h2>
           <div className="mb-2 space-y-3">
+            <div>
+              <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">{t('newReport.educator')}</label>
+              <select
+                name="educator"
+                value={form.educator}
+                onChange={handleChange}
+                className="w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
+                required
+              >
+                <option value="" disabled>{t('newReport.selectEducator')}</option>
+                {EDUCATORS.map(name => (
+                  <option key={name} value={name}>{name}</option>
+                 ))}
+                <option value={OTHER_EDUCATOR_VALUE}>{t('newReport.educatorOther')}</option>
+              </select>
+              {form.educator === OTHER_EDUCATOR_VALUE && (
+                <input
+                  type="text"
+                  name="educatorOther"
+                  value={form.educatorOther}
+                  onChange={handleChange}
+                  className="mt-2 w-full border border-blue-100 rounded-xl p-2 focus:ring-2 focus:ring-[var(--primary-blue)] focus:outline-none bg-white/80 transition-all duration-150"
+                  placeholder={t('newReport.educatorOtherPlaceholder')}
+                  required
+                />
+              )}
+            </div>
             <div>
               <label className="block mb-1 font-semibold text-[color:var(--text-primary)]">{t('newReport.shiftType')}</label>
               <select
@@ -290,7 +395,7 @@ export default function NewShiftReportForm({ onCreated, initialShiftType, open, 
               placeholder={t('newReport.notesPlaceholder')}
             />
           </div>
-          {error && <div className="text-red-500 mb-2">{t('newReport.error')}</div>}
+          {error && <div className="text-red-500 mb-2">{error}</div>}
           <button type="submit" className="px-4 sm:px-6 py-2 rounded-[16px] bg-gradient-to-r from-[#E3E8FF] to-[#D6F0FF] text-[#6C63FF] font-bold shadow-[0_4px_16px_0_rgba(60,60,120,0.10)] shadow-inner border-none outline-none transition-all duration-200 active:scale-95 hover:from-[#D6F0FF] hover:to-[#E3E8FF] hover:shadow-[0_6px_24px_0_rgba(60,60,120,0.15)] text-xs sm:text-base mt-2 disabled:opacity-60 disabled:cursor-not-allowed" disabled={loading}>
             {loading ? t('newReport.saving') : t('newReport.submit')}
           </button>

@@ -8,8 +8,18 @@ import NewShiftReportForm from "./NewShiftReportForm";
 import { Sun, CalendarDays, TrendingUp, FileText, AlertCircle, Moon, CloudSun, Info, User, Mail, Phone, PhoneCall, MessageCircle, MessageSquare, Linkedin } from "lucide-react";
 import ReportList from "../components/ReportList";
 import ReportModal from "../components/ReportModal";
+import HouseCard from "../components/HouseCard";
+import HouseDetailModal from "../components/HouseDetailModal";
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+
+const PATIENTS_BY_HOUSE = {
+  1: ["רפאל", "יוסף", "שלמה", "אלי", "אייל", "ירון"],
+  2: ["אדם יעקב", "יוסף", "מנחם", "מרדכי", "שי אריאל", "שמעון"],
+  3: ["אהרן", "גד", "רובין", "אברהם", "שחר", "יהודה"],
+  4: ["מאיר", "אושרי", "יאיר", "אביאל", "בן ציון", "משה"],
+  5: ["דן", "יהושע", "דוד", "אורי", "ליאב", "סטיב", "ז'וליאן", "פרנק", "נאור", "דוד", "ברונו", "בנימין"],
+};
 
 function formatDate(dateStr) {
   if (!dateStr) return "";
@@ -36,6 +46,8 @@ export default function Dashboard() {
   const [fields, setFields] = useState([]);
   const [lang, setLang] = useState(i18n.language);
   const [showBusinessCard, setShowBusinessCard] = useState(false);
+  const [selectedHouse, setSelectedHouse] = useState(null);
+  const [houseDetailOpen, setHouseDetailOpen] = useState(false);
 
   useEffect(() => {
     async function fetchReportsAndUsers() {
@@ -153,6 +165,25 @@ export default function Dashboard() {
         <StatCard icon={<AlertCircle />} label={t('dashboard.totalIncidents')} value={totalIncidents} color="bg-red-50" />
       </div>
 
+      {/* House Cards Section */}
+      <div className="mb-10">
+        <h2 className="text-xl sm:text-2xl font-bold text-[color:var(--primary-blue)] mb-4">{t('dashboard.houses')}</h2>
+        <div className="grid grid-cols-5 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-4">
+          {[1, 2, 3, 4, 5].map(houseNum => (
+            <HouseCard
+              key={houseNum}
+              houseNumber={houseNum}
+              reports={reports}
+              patients={PATIENTS_BY_HOUSE[houseNum]}
+              onClick={() => {
+                setSelectedHouse(houseNum);
+                setHouseDetailOpen(true);
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
       <div className="bg-white/80 rounded-2xl shadow-lg border border-blue-100 backdrop-blur-sm p-2 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
           <h2 className="text-lg sm:text-xl font-bold text-[color:var(--primary-blue)]">{t('dashboard.recentReports')}</h2>
@@ -172,6 +203,17 @@ export default function Dashboard() {
         onClose={() => setModalOpen(false)}
         report={selectedReport}
         user={users[selectedReport?.userId]}
+        fields={fields}
+      />
+      <HouseDetailModal
+        open={houseDetailOpen}
+        onClose={() => {
+          setHouseDetailOpen(false);
+          setSelectedHouse(null);
+        }}
+        houseNumber={selectedHouse}
+        reports={reports}
+        users={users}
         fields={fields}
       />
       {/* Footer */}
